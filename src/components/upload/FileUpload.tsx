@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface FileUploadProps {
   taskId?: string;
+  userId: string;
   onUploadComplete?: () => void;
 }
 
@@ -20,7 +21,7 @@ interface UploadFile {
   error?: string;
 }
 
-export default function FileUpload({ taskId, onUploadComplete }: FileUploadProps) {
+export default function FileUpload({ taskId, userId, onUploadComplete }: FileUploadProps) {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +91,7 @@ export default function FileUpload({ taskId, onUploadComplete }: FileUploadProps
             file_size: uploadFile.file.size,
             mime_type: uploadFile.file.type,
             task_id: taskId || null,
+            uploaded_by: userId,
           });
 
         if (dbError) throw dbError;

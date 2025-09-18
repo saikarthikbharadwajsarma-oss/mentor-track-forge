@@ -216,7 +216,7 @@ export default function InternDashboard({ profile }: InternDashboardProps) {
           </DialogContent>
         </Dialog>
 
-        <FileUpload onUploadComplete={() => fetchTasks()} />
+        <FileUpload userId={profile.user_id} onUploadComplete={() => fetchTasks()} />
       </div>
 
       {/* Upload Dialog */}
@@ -228,6 +228,7 @@ export default function InternDashboard({ profile }: InternDashboardProps) {
           {selectedTaskForUpload && (
             <FileUpload 
               taskId={selectedTaskForUpload} 
+              userId={profile.user_id}
               onUploadComplete={() => {
                 setSelectedTaskForUpload(null);
                 fetchTasks();

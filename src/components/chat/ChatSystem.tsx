@@ -23,7 +23,11 @@ interface Message {
   receiver_id: string;
   created_at: string;
   read_at: string | null;
-  sender?: Profile;
+  sender?: {
+    full_name: string | null;
+    email: string;
+    role: string;
+  };
 }
 
 interface ChatSystemProps {
