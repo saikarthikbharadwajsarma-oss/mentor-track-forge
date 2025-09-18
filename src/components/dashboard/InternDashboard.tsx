@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Trophy, 
   CheckSquare, 
@@ -12,9 +13,12 @@ import {
   Star,
   Calendar,
   Upload,
-  Target
+  Target,
+  MessageCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import FileUpload from "@/components/upload/FileUpload";
+import ChatSystem from "@/components/chat/ChatSystem";
 
 interface Profile {
   id: string;
@@ -44,6 +48,8 @@ interface InternDashboardProps {
 export default function InternDashboard({ profile }: InternDashboardProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTaskForUpload, setSelectedTaskForUpload] = useState<string | null>(null);
+  const [showChat, setShowChat] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -186,6 +192,51 @@ export default function InternDashboard({ profile }: InternDashboardProps) {
         </Card>
       </div>
 
+      {/* Chat and File Upload */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Dialog open={showChat} onOpenChange={setShowChat}>
+          <DialogTrigger asChild>
+            <Card className="bg-gradient-card shadow-card border-border hover:shadow-elevated transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Team Chat
+                </CardTitle>
+                <CardDescription>
+                  Communicate with your supervisors and team
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="bg-card border-border max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Team Chat</DialogTitle>
+            </DialogHeader>
+            <ChatSystem currentUser={profile} />
+          </DialogContent>
+        </Dialog>
+
+        <FileUpload onUploadComplete={() => fetchTasks()} />
+      </div>
+
+      {/* Upload Dialog */}
+      <Dialog open={!!selectedTaskForUpload} onOpenChange={() => setSelectedTaskForUpload(null)}>
+        <DialogContent className="bg-card border-border max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Upload File for Task</DialogTitle>
+          </DialogHeader>
+          {selectedTaskForUpload && (
+            <FileUpload 
+              taskId={selectedTaskForUpload} 
+              onUploadComplete={() => {
+                setSelectedTaskForUpload(null);
+                fetchTasks();
+              }} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Tasks List */}
       <Card className="bg-gradient-card shadow-card border-border">
         <CardHeader>
@@ -260,7 +311,11 @@ export default function InternDashboard({ profile }: InternDashboardProps) {
                         Complete
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedTaskForUpload(task.id)}
+                    >
                       <Upload className="w-3 h-3 mr-1" />
                       Upload
                     </Button>

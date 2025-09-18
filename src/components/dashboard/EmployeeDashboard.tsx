@@ -16,8 +16,10 @@ import {
   Trophy,
   Calendar,
   AlertCircle,
-  User
+  User,
+  MessageCircle
 } from "lucide-react";
+import ChatSystem from "@/components/chat/ChatSystem";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -52,6 +54,7 @@ export default function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
   const [interns, setInterns] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -74,7 +77,7 @@ export default function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
         .from('tasks')
         .select(`
           *,
-          profiles!tasks_assignee_id_fkey(full_name, email)
+          profiles(full_name, email)
         `)
         .eq('created_by', profile.user_id)
         .order('created_at', { ascending: false });
@@ -299,7 +302,26 @@ export default function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        
+        <Button
+          onClick={() => setShowChat(true)}
+          variant="outline"
+          className="border-border hover:bg-muted"
+        >
+          <MessageCircle className="w-4 h-4 mr-2" />
+          Team Chat
+        </Button>
       </div>
+
+      {/* Chat Dialog */}
+      <Dialog open={showChat} onOpenChange={setShowChat}>
+        <DialogContent className="bg-card border-border max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Team Chat</DialogTitle>
+          </DialogHeader>
+          <ChatSystem currentUser={profile} />
+        </DialogContent>
+      </Dialog>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
